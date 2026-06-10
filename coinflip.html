@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Flip</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07080f;
+            --gold: #c9962a;
+            --gold-light: #e8b84b;
+            --dark: #1a1208;
+            --muted: #7a6a8a;
+            --text: #e8dff8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Star field */
+        .stars {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Nebula glow layers */
+        .nebula {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .nebula::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(75,42,122,0.35) 0%, transparent 70%);
+            top: -150px;
+            left: -100px;
+            animation: drift1 18s ease-in-out infinite alternate;
+        }
+        .nebula::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(20,60,120,0.3) 0%, transparent 70%);
+            bottom: -100px;
+            right: -80px;
+            animation: drift2 22s ease-in-out infinite alternate;
+        }
+        .nebula-mid {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(180,80,20,0.12) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulse 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(60px, 40px) scale(1.1); } }
+        @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-50px, -30px) scale(1.08); } }
+        @keyframes pulse { from { opacity: 0.6; } to { opacity: 1; } }
+
+        /* Shooting star */
+        .shoot {
+            position: fixed;
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e8b84b, transparent);
+            top: 18%;
+            left: -140px;
+            transform: rotate(-20deg);
+            animation: shoot 8s linear infinite;
+            z-index: 0;
+            opacity: 0;
+        }
+        @keyframes shoot {
+            0%   { left: -140px; opacity: 0; }
+            5%   { opacity: 1; }
+            40%  { left: 110vw; opacity: 0; }
+            100% { left: 110vw; opacity: 0; }
+        }
+
+        /* Content */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text);
+            letter-spacing: 0.08em;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 30px rgba(201,150,42,0.4);
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            letter-spacing: 0.25em;
+            color: var(--gold);
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+            margin-top: -1rem;
+            opacity: 0.8;
+        }
+
+        .coin-wrap {
+            perspective: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .coin {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            background: #1a1208;
+            border: 3px solid #c9962a;
+            box-shadow: 0 0 30px rgba(201,150,42,0.25), inset 0 0 20px rgba(0,0,0,0.6);
+        }
+
+        .face.tails {
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+        }
+
+        /* Result text */
+        .result-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            min-height: 2.5rem;
+            color: var(--text);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(201,150,42,0.3);
+        }
+
+        .result-text span { color: var(--gold); }
+
+        .result-sub {
+            font-size: 0.78rem;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+            text-align: center;
+            min-height: 1.2rem;
+            position: relative;
+            z-index: 1;
+            margin-top: -0.8rem;
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--gold);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.8rem 2.8rem;
+            border: 1.5px solid var(--gold);
+            border-radius: 40px;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            background: var(--gold);
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(201,150,42,0.4);
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .tally {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-align: center;
+            letter-spacing: 0.08em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tally span { color: var(--gold); opacity: 0.8; }
+
+        /* Orbit ring around coin */
+        .orbit {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 1px solid rgba(201,150,42,0.15);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 12s linear infinite;
+            pointer-events: none;
+        }
+        .orbit::after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: var(--gold);
+            border-radius: 50%;
+            top: -2.5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 6px var(--gold);
+        }
+        @keyframes rotate { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+        .coin-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas class="stars" id="stars"></canvas>
+    <div class="nebula"></div>
+    <div class="nebula-mid"></div>
+    <div class="shoot"></div>
+
+    <h1>Coin of Fate</h1>
+    <p class="subtitle">Let the universe decide</p>
+
+    <div class="coin-wrap">
+        <div class="coin-container">
+            <div class="orbit"></div>
+            <div class="coin" id="coin">
+
+                <!-- HEADS: All-seeing eye -->
+                <div class="face heads">
+                    <svg width="140" height="140" viewBox="0 0 140 140">
+                        <!-- outer ring -->
+                        <circle cx="70" cy="70" r="66" fill="#1a1208" stroke="#c9962a" stroke-width="2"/>
+                        <circle cx="70" cy="70" r="58" fill="none" stroke="#c9962a" stroke-width="0.6" stroke-dasharray="5 3" opacity="0.5"/>
+                        <!-- rays -->
+                        <line x1="70" y1="8" x2="70" y2="18" stroke="#c9962a" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="70" y1="122" x2="70" y2="132" stroke="#c9962a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                        <line x1="8" y1="70" x2="18" y2="70" stroke="#c9962a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                        <line x1="122" y1="70" x2="132" y2="70" stroke="#c9962a" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+                        <line x1="24" y1="24" x2="31" y2="31" stroke="#c9962a" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+                        <line x1="109" y1="24" x2="116" y2="17" stroke="#c9962a" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+                        <line x1="24" y1="116" x2="31" y2="109" stroke="#c9962a" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+                        <line x1="109" y1="116" x2="116" y2="109" stroke="#c9962a" stroke-width="1.2" stroke-linecap="round" opacity="0.3"/>
+                        <!-- eye shape -->
+                        <ellipse cx="70" cy="68" rx="26" ry="15" fill="#c9962a" opacity="0.15" stroke="#c9962a" stroke-width="1.5"/>
+                        <!-- iris -->
+                        <circle cx="70" cy="68" r="10" fill="#1a1208" stroke="#e8b84b" stroke-width="1.2"/>
+                        <!-- pupil -->
+                        <circle cx="70" cy="68" r="5.5" fill="#c9962a"/>
+                        <circle cx="70" cy="68" r="2.5" fill="#1a1208"/>
+                        <!-- highlight -->
+                        <circle cx="72.5" cy="66" r="1.2" fill="#e8b84b"/>
+                        <!-- lashes top -->
+                        <path d="M44 68 Q70 48 96 68" fill="none" stroke="#c9962a" stroke-width="1.2" opacity="0.7"/>
+                        <!-- lashes bottom -->
+                        <path d="M44 68 Q70 82 96 68" fill="none" stroke="#c9962a" stroke-width="1" opacity="0.5"/>
+                        <!-- label -->
+                        <text x="70" y="105" text-anchor="middle" font-size="8" fill="#c9962a" font-family="serif" letter-spacing="4" opacity="0.7">ALL-SEEING</text>
+                    </svg>
+                </div>
+
+                <!-- TAILS: Hourglass -->
+                <div class="face tails">
+                    <svg width="140" height="140" viewBox="0 0 140 140">
+                        <circle cx="70" cy="70" r="66" fill="#1a1208" stroke="#c9962a" stroke-width="2"/>
+                        <circle cx="70" cy="70" r="58" fill="none" stroke="#c9962a" stroke-width="0.6" stroke-dasharray="5 3" opacity="0.5"/>
+                        <!-- hourglass frame -->
+                        <rect x="48" y="34" width="44" height="8" rx="3" fill="#c9962a"/>
+                        <rect x="48" y="98" width="44" height="8" rx="3" fill="#c9962a"/>
+                        <!-- hourglass curves -->
+                        <path d="M48 42 Q48 64 70 70 Q92 76 92 98" fill="none" stroke="#c9962a" stroke-width="1.8" opacity="0.8"/>
+                        <path d="M92 42 Q92 64 70 70 Q48 76 48 98" fill="none" stroke="#c9962a" stroke-width="1.8" opacity="0.8"/>
+                        <!-- sand top (empty upper) -->
+                        <path d="M50 44 Q50 60 70 70 Q86 62 90 44 Z" fill="#c9962a" opacity="0.07"/>
+                        <!-- sand bottom (filled lower) -->
+                        <path d="M50 96 Q52 82 70 70 Q88 82 90 96 Z" fill="#c9962a" opacity="0.25"/>
+                        <!-- falling sand particles -->
+                        <circle cx="70" cy="72" r="1.5" fill="#e8b84b" opacity="0.7"/>
+                        <circle cx="69" cy="77" r="1" fill="#e8b84b" opacity="0.5"/>
+                        <circle cx="71" cy="81" r="1.2" fill="#e8b84b" opacity="0.4"/>
+                        <circle cx="68" cy="85" r="0.8" fill="#e8b84b" opacity="0.3"/>
+                        <!-- label -->
+                        <text x="70" y="118" text-anchor="middle" font-size="8" fill="#c9962a" font-family="serif" letter-spacing="4" opacity="0.7">TIME FLOWS</text>
+                    </svg>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <p class="result-text" id="resultText">Tempt fate...</p>
+    <p class="result-sub" id="resultSub"></p>
+
+    <button class="btn" onclick="flipCoin()">Flip the coin</button>
+
+    <p class="tally" id="tally"></p>
+
+    <script>
+        // Star canvas
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; drawStars(); }
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < 220; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const r = Math.random() * 1.2;
+                const gold = Math.random() < 0.08;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = gold ? 'rgba(201,150,42,0.8)' : `rgba(255,255,255,${0.3 + Math.random() * 0.6})`;
+                ctx.fill();
+            }
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Coin flip
+        let heads = 0, tails = 0;
+        const headsLines = ["The eye sees all.", "Fate watches you.", "The cosmos speaks.", "It was written."];
+        const tailsLines = ["Time has decided.", "The sands have fallen.", "Destiny flows.", "The hourglass knows."];
+
+        let currentDeg = 0;
+
+        function flipCoin() {
+            const coin = document.getElementById("coin");
+            const resultText = document.getElementById("resultText");
+            const resultSub = document.getElementById("resultSub");
+            const tally = document.getElementById("tally");
+
+            resultText.style.opacity = "0.3";
+            resultSub.textContent = "";
+
+            const isHeads = Math.random() < 0.5;
+
+            // Spin 5 full rotations + land on correct face
+            // Heads = multiple of 360, Tails = 180 offset
+            const spins = 1800;
+            const faceDeg = isHeads ? 0 : 180;
+            const targetDeg = currentDeg + spins + (faceDeg - (currentDeg % 360) + 360) % 360;
+            currentDeg = targetDeg;
+
+            coin.style.transition = "transform 0.8s ease";
+            coin.style.transform = "rotateY(" + targetDeg + "deg)";
+
+            setTimeout(function() {
+                resultText.style.opacity = "1";
+                if (isHeads) {
+                    heads++;
+                    resultText.innerHTML = "The Eye — <span>Heads</span>";
+                    resultSub.textContent = headsLines[Math.floor(Math.random() * headsLines.length)];
+                } else {
+                    tails++;
+                    resultText.innerHTML = "The Glass — <span>Tails</span>";
+                    resultSub.textContent = tailsLines[Math.floor(Math.random() * tailsLines.length)];
+                }
+                tally.innerHTML = "<span>Heads: " + heads + "</span>  ·  <span>Tails: " + tails + "</span>";
+            }, 800);
+        }
+    </script>
+</body>
+</html>

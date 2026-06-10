@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Open Day Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a6e;
+            --accent: #e63946;
+            --light-bg: #f4f7ff;
+        }
+
+        body {
+            background: var(--light-bg);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #0d2246 100%);
+            color: white;
+            padding: 3.5rem 0 2.5rem;
+            clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+            margin-bottom: -1.5rem;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(2rem, 5vw, 3rem);
+            line-height: 1.1;
+        }
+
+        .hero p {
+            opacity: 0.8;
+            font-size: 1.05rem;
+            margin-top: 0.75rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 40px rgba(26,58,110,0.10);
+            border-top: 4px solid var(--accent);
+        }
+
+        .section-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid #e0e7ff;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-control {
+            border: 1.5px solid #dde3f0;
+            border-radius: 8px;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,58,110,0.1);
+        }
+
+        .form-control.is-invalid { border-color: var(--accent); }
+
+        .invalid-feedback { color: var(--accent); font-size: 0.8rem; }
+
+        .time-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .time-label {
+            flex: 1;
+            border: 1.5px solid #dde3f0;
+            border-radius: 8px;
+            padding: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .time-label:has(input:checked) {
+            border-color: var(--primary);
+            background: #f0f4ff;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .time-label input { accent-color: var(--primary); }
+
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.03em;
+            padding: 0.85rem 2rem;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover { background: #c12535; }
+        .btn-submit:active { transform: scale(0.99); }
+
+        #message {
+            border-radius: 10px;
+            padding: 1.1rem 1.4rem;
+            font-size: 0.95rem;
+            display: none;
+            margin-top: 1.25rem;
+        }
+
+        #message.success {
+            background: #eafaf1;
+            border: 1.5px solid #27ae60;
+            color: #1d7a43;
+            display: block;
+        }
+
+        #message.error-msg {
+            background: #fff0f1;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+            display: block;
+        }
+
+        .footer-note {
+            font-size: 0.78rem;
+            color: #999;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-7 text-center">
+                    <span class="hero-tag">Open Day 2025</span>
+                    <h1>Department of Computer Science</h1>
+                    <p>Register your place and we'll be in touch with everything you need to know.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="form-card">
+
+                    <p class="section-label">Your Details</p>
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="form-label" for="firstname">First Name</label>
+                            <input type="text" class="form-control" id="firstname" placeholder="Jane">
+                            <div class="invalid-feedback">Please enter your first name.</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label" for="surname">Surname</label>
+                            <input type="text" class="form-control" id="surname" placeholder="Smith">
+                            <div class="invalid-feedback">Please enter your surname.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="text" class="form-control" id="email" placeholder="jane@example.com">
+                            <div class="invalid-feedback" id="emailError">Please enter a valid email address.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="telephone">Telephone Number</label>
+                            <input type="text" class="form-control" id="telephone" placeholder="07700 900000">
+                            <div class="invalid-feedback">Please enter your telephone number.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Preferred Session</label>
+                            <div class="time-options">
+                                <label class="time-label">
+                                    <input type="radio" name="session" id="sessionAM" value="AM"> 🌅 Morning (AM)
+                                </label>
+                                <label class="time-label">
+                                    <input type="radio" name="session" id="sessionPM" value="PM"> 🌇 Afternoon (PM)
+                                </label>
+                            </div>
+                            <div class="invalid-feedback" id="sessionError" style="display:none;">Please choose a session time.</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-submit" onclick="submitForm()">Register for Open Day</button>
+
+                    <div id="message"></div>
+                    <p class="footer-note">Your details will only be used to contact you about the open day.</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitForm() {
+            let valid = true;
+
+            // Clear previous state
+            document.querySelectorAll('.form-control').forEach(function(el) {
+                el.classList.remove('is-invalid');
+            });
+            document.getElementById("sessionError").style.display = "none";
+            let msg = document.getElementById("message");
+            msg.className = "";
+            msg.textContent = "";
+
+            // First name
+            let firstname = document.getElementById("firstname").value.trim();
+            if (firstname === "") {
+                document.getElementById("firstname").classList.add("is-invalid");
+                valid = false;
+            }
+
+            // Surname
+            let surname = document.getElementById("surname").value.trim();
+            if (surname === "") {
+                document.getElementById("surname").classList.add("is-invalid");
+                valid = false;
+            }
+
+            // Email - basic format check
+            let email = document.getElementById("email").value.trim();
+            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email === "") {
+                document.getElementById("emailError").textContent = "Please enter your email address.";
+                document.getElementById("email").classList.add("is-invalid");
+                valid = false;
+            } else if (!emailRegex.test(email)) {
+                document.getElementById("emailError").textContent = "Please enter a valid email address.";
+                document.getElementById("email").classList.add("is-invalid");
+                valid = false;
+            }
+
+            // Telephone
+            let tel = document.getElementById("telephone").value.trim();
+            if (tel === "") {
+                document.getElementById("telephone").classList.add("is-invalid");
+                valid = false;
+            }
+
+            // Session
+            let session = document.querySelector('input[name="session"]:checked');
+            if (!session) {
+                document.getElementById("sessionError").style.display = "block";
+                valid = false;
+            }
+
+            if (valid) {
+                msg.textContent = "✓ Well done, a member of our team will get back to you.";
+                msg.className = "success";
+                // Reset form
+                document.querySelectorAll('.form-control').forEach(function(el) { el.value = ""; });
+                document.querySelectorAll('input[type="radio"]').forEach(function(el) { el.checked = false; });
+            } else {
+                msg.textContent = "Please complete all required fields before submitting.";
+                msg.className = "error-msg";
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
